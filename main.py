@@ -88,8 +88,8 @@ def generate_meme_explanation(pdf_text: str) -> str:
         # CUSTOMIZATION POINT: Change this to modify how the PDF content is presented to the AI
         user_prompt = (
             f"Here's the content from a PDF that needs your magic touch! "
-            f"Transform this into a LONG, entertaining, detailed explanation. "
-            f"Make it extensive with multiple sections, tons of examples, stories, and humor. "
+            f"Transform this into a LONG, entertaining explanation. "
+            f"Make it extensive tons of examples, stories, and humor. "
             f"Users love reading long, funny content - so go wild with the details!\n\n"
             f"PDF CONTENT:\n{pdf_text[:12000]}"  # Increased limit for more content
         )
