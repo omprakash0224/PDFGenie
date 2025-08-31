@@ -91,6 +91,7 @@ def generate_meme_explanation(pdf_text: str) -> str:
             f"Transform this into a LONG, entertaining explanation. "
             f"Make it extensive tons of examples, stories, and humor. "
             f"Users love reading long, funny content - so go wild with the details!\n\n"
+            f"Please ensure your response covers all the key points from the PDF and is easy to understand.\n\n"
             f"PDF CONTENT:\n{pdf_text[:12000]}"  # Increased limit for more content
         )
         
