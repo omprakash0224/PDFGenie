@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Genie</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom animations and styles */
+        @keyframes bounce-gentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .bounce-gentle {
+            animation: bounce-gentle 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.6); }
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        .drag-over {
+            border-color: #8B5CF6 !important;
+            background-color: rgba(139, 92, 246, 0.1) !important;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-100 via-pink-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-4 sm:py-8 max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8 sm:mb-12">
+            <div class="bounce-gentle inline-block text-4xl sm:text-6xl mb-2 sm:mb-4">🧞‍♂️</div>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 mb-2 sm:mb-4">
+                PDF Genie
+            </h1>
+            <p class="text-base sm:text-lg md:text-xl text-gray-600 mb-2 px-2">
+                Transform boring PDFs into entertaining, meme-style explanations! ✨
+            </p>
+            <p class="text-xs sm:text-sm text-gray-500 px-2 mb-2">
+                Upload manuals, legal docs, textbooks, policies - I'll make them fun to read! 📚➡️😂
+            </p>
+            <p class="text-xs sm:text-sm text-gray-500 px-2">
+                For longer PDFs like textbooks, try splitting them into sections under 10 pages each for best results! 📄✂️
+            </p>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="bg-white rounded-2xl shadow-xl p-4 sm:p-8 mb-6 sm:mb-8">
+            <div class="text-center mb-4 sm:mb-6">
+                <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">
+                    Drop Your PDF Here 📄
+                </h2>
+                <p class="text-sm sm:text-base text-gray-600 px-2">
+                    Drag and drop or click to select your PDF file (max 10MB)
+                </p>
+            </div>
+
+            <!-- File Upload Area -->
+            <div id="dropZone" class="border-3 border-dashed border-gray-300 rounded-xl p-6 sm:p-12 text-center cursor-pointer transition-all duration-300 hover:border-purple-400 hover:bg-purple-50">
+                <div class="space-y-3 sm:space-y-4">
+                    <div class="text-3xl sm:text-5xl">📎</div>
+                    <div>
+                        <p class="text-base sm:text-lg font-medium text-gray-700 px-2">
+                            Choose a PDF file or drag it here
+                        </p>
+                        <p class="text-xs sm:text-sm text-gray-500 mt-1 px-2">
+                            Supported: PDF files up to 10MB
+                        </p>
+                    </div>
+                    <input type="file" id="fileInput" accept=".pdf" class="hidden">
+                    <button id="selectButton" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 sm:py-3 sm:px-6 rounded-lg transition-colors duration-200 text-sm sm:text-base">
+                        Select PDF File
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selected File Display -->
+            <div id="selectedFile" class="hidden mt-4 sm:mt-6 p-3 sm:p-4 bg-gray-50 rounded-lg border">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                        <div class="text-xl sm:text-2xl flex-shrink-0">📄</div>
+                        <div class="min-w-0 flex-1">
+                            <p id="fileName" class="font-medium text-gray-800 text-sm sm:text-base truncate"></p>
+                            <p id="fileSize" class="text-xs sm:text-sm text-gray-600"></p>
+                        </div>
+                    </div>
+                    <button id="removeFile" class="text-red-500 hover:text-red-700 font-medium text-sm sm:text-base flex-shrink-0 ml-2">
+                        Remove
+                    </button>
+                </div>
+            </div>
+
+            <!-- Explain Button -->
+            <div class="text-center mt-6 sm:mt-8">
+                <button id="explainButton" disabled class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-xl text-base sm:text-lg transition-all duration-300 disabled:cursor-not-allowed transform hover:scale-105 disabled:hover:scale-100 w-full sm:w-auto">
+                    <span id="buttonText">🪄 Explain My PDF!</span>
+                    <div id="loadingSpinner" class="hidden inline-block ml-2">
+                        <div class="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white"></div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden bg-white rounded-2xl shadow-xl p-4 sm:p-8">
+            <div class="text-center mb-4 sm:mb-6">
+                <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">
+                    🎉 Your PDF Explanation is Ready!
+                </h2>
+                <p class="text-sm sm:text-base text-gray-600 px-2">
+                    Here's what PDF Genie made of your document:
+                </p>
+            </div>
+            
+            <div id="explanation" class="prose prose-sm sm:prose-lg max-w-none bg-gradient-to-r from-purple-50 to-pink-50 p-3 sm:p-6 rounded-xl border-l-4 border-purple-500 max-h-[400px] sm:max-h-[600px] overflow-y-auto text-sm sm:text-base">
+                <!-- AI explanation will appear here -->
+            </div>
+            
+            <div class="text-center mt-4 sm:mt-6">
+                <button id="uploadAnother" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 sm:py-3 sm:px-6 rounded-lg transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
+                    📄 Upload Another PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Error Section -->
+        <div id="errorSection" class="hidden bg-red-50 border border-red-200 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8">
+            <div class="flex items-center space-x-2 sm:space-x-3 mb-3">
+                <div class="text-xl sm:text-2xl">❌</div>
+                <h3 class="text-base sm:text-lg font-semibold text-red-800">Oops! Something went wrong</h3>
+            </div>
+            <p id="errorMessage" class="text-sm sm:text-base text-red-700"></p>
+            <button id="tryAgain" class="mt-3 sm:mt-4 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
+                Try Again
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8 sm:mt-12 text-gray-500">
+            <p class="text-xs sm:text-sm px-4">
+                Powered by Gemini AI ✨ | Made with ❤️ for making PDFs fun again!
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const selectButton = document.getElementById('selectButton');
+        const selectedFile = document.getElementById('selectedFile');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const removeFile = document.getElementById('removeFile');
+        const explainButton = document.getElementById('explainButton');
+        const buttonText = document.getElementById('buttonText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const resultsSection = document.getElementById('resultsSection');
+        const explanation = document.getElementById('explanation');
+        const uploadAnother = document.getElementById('uploadAnother');
+        const errorSection = document.getElementById('errorSection');
+        const errorMessage = document.getElementById('errorMessage');
+        const tryAgain = document.getElementById('tryAgain');
+
+        let selectedPdfFile = null;
+
+        // Format file size helper function
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // File selection handlers
+        selectButton.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Drag and drop functionality
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelection(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelection(e.target.files[0]);
+            }
+        });
+
+        // Handle file selection
+        function handleFileSelection(file) {
+            // Validate file type
+            if (file.type !== 'application/pdf') {
+                showError('Please select a PDF file! 📄');
+                return;
+            }
+
+            // Validate file size (10MB limit)
+            if (file.size > 10 * 1024 * 1024) {
+                showError('File is too large! Please select a PDF smaller than 10MB. 🚫');
+                return;
+            }
+
+            selectedPdfFile = file;
+            
+            // Update UI
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            selectedFile.classList.remove('hidden');
+            explainButton.disabled = false;
+            
+            // Hide any previous results or errors
+            hideResults();
+            hideError();
+        }
+
+        // Remove file handler
+        removeFile.addEventListener('click', () => {
+            selectedPdfFile = null;
+            selectedFile.classList.add('hidden');
+            explainButton.disabled = true;
+            fileInput.value = '';
+        });
+
+        // Explain button handler
+        explainButton.addEventListener('click', async () => {
+            if (!selectedPdfFile) return;
+
+            // Update UI for loading state
+            explainButton.disabled = true;
+            buttonText.textContent = '🪄 Working magic...';
+            loadingSpinner.classList.remove('hidden');
+            hideResults();
+            hideError();
+
+            try {
+                // Create form data
+                const formData = new FormData();
+                formData.append('file', selectedPdfFile);
+
+                // Upload and process PDF
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    // Show successful result
+                    showResults(result.explanation);
+                } else {
+                    // Show error from server
+                    showError(result.message || result.detail || 'Failed to process PDF');
+                }
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                showError('Network error! Please check your connection and try again. 🌐');
+            } finally {
+                // Reset button state
+                explainButton.disabled = false;
+                buttonText.textContent = '🪄 Explain My PDF!';
+                loadingSpinner.classList.add('hidden');
+            }
+        });
+
+        // Show results
+        function showResults(explanationText) {
+            // Convert line breaks to HTML and preserve formatting better
+            const formattedText = explanationText
+                .replace(/\n/g, '<br>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Bold text
+                .replace(/\*(.*?)\*/g, '<em>$1</em>');  // Italic text
+            
+            explanation.innerHTML = formattedText;
+            resultsSection.classList.remove('hidden');
+            
+            // Debug: Log the full text to console to check if it's being cut off
+            console.log('Full explanation length:', explanationText.length);
+            console.log('Full explanation:', explanationText);
+            
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Hide results
+        function hideResults() {
+            resultsSection.classList.add('hidden');
+        }
+
+        // Show error
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorSection.classList.remove('hidden');
+            errorSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Hide error
+        function hideError() {
+            errorSection.classList.add('hidden');
+        }
+
+        // Upload another button
+        uploadAnother.addEventListener('click', () => {
+            selectedPdfFile = null;
+            selectedFile.classList.add('hidden');
+            explainButton.disabled = true;
+            fileInput.value = '';
+            hideResults();
+            hideError();
+            
+            // Scroll back to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Try again button
+        tryAgain.addEventListener('click', () => {
+            hideError();
+        });
+    </script>
+</body>
+</html>

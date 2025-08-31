@@ -1,0 +1,14 @@
+[project]
+name = "pdfGenie"
+version = "0.1.0"
+description = "PDF Genie is a web application that transforms boring PDFs into entertaining, meme-style explanations"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.116.1",
+    "google-genai>=1.32.0",
+    "pypdf2>=3.0.1",
+    "python-dotenv>=1.1.1",
+    "python-multipart>=0.0.20",
+    "sift-stack-py>=0.8.4",
+    "uvicorn>=0.35.0",
+]
